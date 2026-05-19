@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { cn, getDomain, getHealthScoreBarColor, getHealthScoreColor } from '@/lib/utils'
-import type { Client } from '@/lib/database.types'
+import type { Client, AgencyRow } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,12 +34,13 @@ export default async function ClientsPage() {
 
   if (!user) redirect('/login')
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) redirect('/dashboard')
 
   const { data: rawClients } = await supabase

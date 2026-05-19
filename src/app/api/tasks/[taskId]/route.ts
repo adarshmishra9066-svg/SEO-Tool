@@ -1,37 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { AgencyRow } from '@/lib/database.types'
 
 interface Params {
   params: Promise<{ taskId: string }>
-}
-
-async function getAuthorisedTask(taskId: string) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return { error: 'Unauthorised', status: 401, supabase }
-
-  const { data: agency } = await supabase
-    .from('agencies')
-    .select('id')
-    .eq('owner_id', user.id)
-    .single()
-
-  if (!agency) return { error: 'Agency not found', status: 404, supabase }
-
-  const { data: task } = await supabase
-    .from('tasks')
-    .select('id')
-    .eq('id', taskId)
-    .eq('agency_id', agency.id)
-    .single()
-
-  if (!task) return { error: 'Task not found', status: 404, supabase }
-
-  return { error: null, status: 200, supabase }
 }
 
 export async function GET(_req: Request, { params }: Params) {
@@ -44,12 +16,13 @@ export async function GET(_req: Request, { params }: Params) {
 
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) return NextResponse.json({ error: 'Agency not found' }, { status: 404 })
 
   const { data: task, error } = await supabase
@@ -68,11 +41,31 @@ export async function GET(_req: Request, { params }: Params) {
 
 export async function PUT(request: Request, { params }: Params) {
   const { taskId } = await params
-  const auth = await getAuthorisedTask(taskId)
+  const supabase = await createClient()
 
-  if (auth.error) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status })
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+
+  const { data: agencyData } = await supabase
+    .from('agencies')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
+  if (!agency) return NextResponse.json({ error: 'Agency not found' }, { status: 404 })
+
+  const { data: existingTask } = await supabase
+    .from('tasks')
+    .select('id')
+    .eq('id', taskId)
+    .eq('agency_id', agency.id)
+    .single()
+
+  if (!existingTask) return NextResponse.json({ error: 'Task not found' }, { status: 404 })
 
   let body: Record<string, unknown>
   try {
@@ -88,9 +81,11 @@ export async function PUT(request: Request, { params }: Params) {
     updateData.completion_date = new Date().toISOString()
   }
 
-  const { data: updated, error } = await auth.supabase
-    .from('tasks')
-    .update({ ...updateData, updated_at: new Date().toISOString() })
+  const payload = { ...updateData, updated_at: new Date().toISOString() }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tasksTable = supabase.from('tasks') as any
+  const { data: updated, error } = await tasksTable
+    .update(payload)
     .eq('id', taskId)
     .select()
     .single()
@@ -104,13 +99,33 @@ export async function PUT(request: Request, { params }: Params) {
 
 export async function DELETE(_req: Request, { params }: Params) {
   const { taskId } = await params
-  const auth = await getAuthorisedTask(taskId)
+  const supabase = await createClient()
 
-  if (auth.error) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status })
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const { error } = await auth.supabase.from('tasks').delete().eq('id', taskId)
+  if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
+
+  const { data: agencyData } = await supabase
+    .from('agencies')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
+  if (!agency) return NextResponse.json({ error: 'Agency not found' }, { status: 404 })
+
+  const { data: existingTask } = await supabase
+    .from('tasks')
+    .select('id')
+    .eq('id', taskId)
+    .eq('agency_id', agency.id)
+    .single()
+
+  if (!existingTask) return NextResponse.json({ error: 'Task not found' }, { status: 404 })
+
+  const { error } = await supabase.from('tasks').delete().eq('id', taskId)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

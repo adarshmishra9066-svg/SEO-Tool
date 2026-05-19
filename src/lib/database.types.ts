@@ -6,98 +6,245 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+// ─── Raw DB row types (no joined fields) ─────────────────────────────────────
+// These are the pure table row types used in the Database generic for Supabase.
+
+export type AgencyRow = {
+  id: string
+  name: string
+  owner_id: string | null
+  logo_url: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ClientRow = {
+  id: string
+  agency_id: string
+  name: string
+  website_url: string
+  industry: string | null
+  target_location: string | null
+  services_products: string | null
+  main_goals: string | null
+  primary_conversion_goal: string | null
+  secondary_conversion_goals: string | null
+  target_audience: string | null
+  brand_tone: string | null
+  content_style_notes: string | null
+  client_expectations_notes: string | null
+  retainer_value: number | null
+  priority_level: 'low' | 'medium' | 'high' | 'critical'
+  client_status: 'active' | 'paused' | 'onboarding' | 'churned'
+  risk_level: 'low' | 'medium' | 'high' | 'critical'
+  seo_health_score: number
+  created_at: string
+  updated_at: string
+}
+
+export type TaskRow = {
+  id: string
+  client_id: string
+  agency_id: string
+  title: string
+  description: string | null
+  task_type: string
+  source: string | null
+  priority_score: number
+  impact: 'low' | 'medium' | 'high' | 'very_high'
+  effort: 'low' | 'medium' | 'high'
+  urgency: 'low' | 'medium' | 'high' | 'critical'
+  status: 'new' | 'planned' | 'in_progress' | 'waiting' | 'completed' | 'skipped'
+  due_date: string | null
+  assigned_to: string | null
+  related_page_url: string | null
+  related_keyword: string | null
+  recommended_action: string | null
+  ai_explanation: string | null
+  checklist: Json[]
+  notes: string | null
+  completion_date: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type OpportunityRow = {
+  id: string
+  client_id: string
+  type: string
+  title: string
+  description: string | null
+  priority_score: number
+  impact: 'low' | 'medium' | 'high' | 'very_high'
+  effort: 'low' | 'medium' | 'high'
+  urgency: 'low' | 'medium' | 'high' | 'critical'
+  related_page_url: string | null
+  related_keyword: string | null
+  data: Json
+  status: 'new' | 'task_created' | 'dismissed'
+  created_at: string
+  updated_at: string
+}
+
+export type SopRow = {
+  id: string
+  agency_id: string | null
+  title: string
+  category: string
+  description: string | null
+  steps: Json[]
+  checklist: Json[]
+  is_built_in: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type GscPropertyRow = {
+  id: string
+  client_id: string
+  property_url: string
+  access_token: string | null
+  refresh_token: string | null
+  token_expiry: string | null
+  is_connected: boolean
+  last_synced: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type GscQueryDataRow = {
+  id: string
+  client_id: string
+  property_id: string
+  query: string
+  page: string | null
+  clicks: number
+  impressions: number
+  ctr: number
+  position: number
+  device: string | null
+  country: string | null
+  date: string
+  created_at: string
+}
+
 export type Database = {
   public: {
     Tables: {
       agencies: {
-        Row: Agency
-        Insert: Omit<Agency, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Agency, 'id'>>
+        Row: AgencyRow
+        Insert: Partial<AgencyRow>
+        Update: Partial<AgencyRow>
       }
       clients: {
-        Row: Client
-        Insert: Omit<Client, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Client, 'id'>>
+        Row: ClientRow
+        Insert: Partial<ClientRow>
+        Update: Partial<ClientRow>
       }
       tasks: {
-        Row: Task
-        Insert: Omit<Task, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Task, 'id'>>
+        Row: TaskRow
+        Insert: Partial<TaskRow>
+        Update: Partial<TaskRow>
       }
       opportunities: {
-        Row: Opportunity
-        Insert: Omit<Opportunity, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Opportunity, 'id'>>
+        Row: OpportunityRow
+        Insert: Partial<OpportunityRow>
+        Update: Partial<OpportunityRow>
       }
       sops: {
-        Row: SOP
-        Insert: Omit<SOP, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<SOP, 'id'>>
+        Row: SopRow
+        Insert: Partial<SopRow>
+        Update: Partial<SopRow>
       }
       gsc_properties: {
-        Row: GscProperty
-        Insert: Omit<GscProperty, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<GscProperty, 'id'>>
+        Row: GscPropertyRow
+        Insert: Partial<GscPropertyRow>
+        Update: Partial<GscPropertyRow>
       }
       gsc_query_data: {
-        Row: GscQueryData
-        Insert: Omit<GscQueryData, 'id' | 'created_at'>
-        Update: Partial<Omit<GscQueryData, 'id'>>
+        Row: GscQueryDataRow
+        Insert: Omit<GscQueryDataRow, 'id' | 'created_at'>
+        Update: Partial<GscQueryDataRow>
+      }
+      ga4_properties: {
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
+      }
+      ga4_landing_page_data: {
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       competitors: {
-        Row: Competitor
-        Insert: Omit<Competitor, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Competitor, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       keywords: {
-        Row: Keyword
-        Insert: Omit<Keyword, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Keyword, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       pages: {
-        Row: Page
-        Insert: Omit<Page, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Page, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       blog_briefs: {
-        Row: BlogBrief
-        Insert: Omit<BlogBrief, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<BlogBrief, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       blog_drafts: {
-        Row: BlogDraft
-        Insert: Omit<BlogDraft, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<BlogDraft, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
+      }
+      content_qa_results: {
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       reports: {
-        Row: Report
-        Insert: Omit<Report, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Report, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       calendar_items: {
-        Row: CalendarItem
-        Insert: Omit<CalendarItem, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<CalendarItem, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       client_history: {
-        Row: ClientHistory
-        Insert: Omit<ClientHistory, 'id' | 'created_at'>
-        Update: Partial<Omit<ClientHistory, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       technical_issues: {
-        Row: TechnicalIssue
-        Insert: Omit<TechnicalIssue, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<TechnicalIssue, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       backlink_prospects: {
-        Row: BacklinkProspect
-        Insert: Omit<BacklinkProspect, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<BacklinkProspect, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
       internal_link_suggestions: {
-        Row: InternalLinkSuggestion
-        Insert: Omit<InternalLinkSuggestion, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<InternalLinkSuggestion, 'id'>>
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
+      }
+      local_seo_items: {
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
+      }
+      ubersuggest_imports: {
+        Row: { [key: string]: unknown }
+        Insert: { [key: string]: unknown }
+        Update: { [key: string]: unknown }
       }
     }
     Views: Record<string, never>
@@ -183,7 +330,7 @@ export type Task = {
   created_at: string
   updated_at: string
   // joined
-  client?: Pick<Client, 'id' | 'name' | 'website_url'>
+  client?: Pick<Client, 'id' | 'name'>
 }
 
 export type Opportunity = {

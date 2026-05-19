@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import type { CreateTaskInput } from '@/lib/database.types'
+import type { AgencyRow, TaskRow, CreateTaskInput } from '@/lib/database.types'
 
 export async function GET(request: Request) {
   const supabase = await createClient()
@@ -11,12 +11,13 @@ export async function GET(request: Request) {
 
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) return NextResponse.json({ error: 'Agency not found' }, { status: 404 })
 
   const { searchParams } = new URL(request.url)
@@ -48,12 +49,13 @@ export async function POST(request: Request) {
 
   if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) return NextResponse.json({ error: 'Agency not found' }, { status: 404 })
 
   let body: CreateTaskInput & { priority_score?: number }
@@ -71,37 +73,41 @@ export async function POST(request: Request) {
   }
 
   // Verify client belongs to agency
-  const { data: clientCheck } = await supabase
+  const { data: clientData } = await supabase
     .from('clients')
     .select('id')
     .eq('id', body.client_id)
     .eq('agency_id', agency.id)
     .single()
 
+  const clientCheck = clientData as Pick<AgencyRow, 'id'> | null
   if (!clientCheck) {
     return NextResponse.json({ error: 'Client not found' }, { status: 404 })
   }
 
+  const insertData: Partial<TaskRow> = {
+    agency_id: agency.id,
+    client_id: body.client_id,
+    title: body.title,
+    description: body.description ?? null,
+    task_type: body.task_type,
+    priority_score: body.priority_score ?? 50,
+    impact: body.impact ?? 'medium',
+    effort: body.effort ?? 'medium',
+    urgency: body.urgency ?? 'medium',
+    due_date: body.due_date ?? null,
+    related_page_url: body.related_page_url ?? null,
+    related_keyword: body.related_keyword ?? null,
+    recommended_action: body.recommended_action ?? null,
+    notes: body.notes ?? null,
+    status: 'new',
+    checklist: [],
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: task, error } = await supabase
     .from('tasks')
-    .insert({
-      agency_id: agency.id,
-      client_id: body.client_id,
-      title: body.title,
-      description: body.description ?? null,
-      task_type: body.task_type,
-      priority_score: body.priority_score ?? 50,
-      impact: body.impact ?? 'medium',
-      effort: body.effort ?? 'medium',
-      urgency: body.urgency ?? 'medium',
-      due_date: body.due_date ?? null,
-      related_page_url: body.related_page_url ?? null,
-      related_keyword: body.related_keyword ?? null,
-      recommended_action: body.recommended_action ?? null,
-      notes: body.notes ?? null,
-      status: 'new',
-      checklist: [],
-    })
+    .insert(insertData as any)
     .select()
     .single()
 

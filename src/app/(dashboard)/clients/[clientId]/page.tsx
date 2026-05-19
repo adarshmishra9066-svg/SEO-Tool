@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
 import { ClientOverview } from '@/components/clients/client-overview'
-import type { Client, Task, Opportunity } from '@/lib/database.types'
+import type { Client, Task, Opportunity, AgencyRow } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,12 +20,13 @@ export default async function ClientOverviewPage({ params }: PageProps) {
 
   if (!user) redirect('/login')
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) redirect('/dashboard')
 
   const { data: rawClient } = await supabase

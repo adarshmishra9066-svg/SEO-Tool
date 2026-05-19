@@ -37,8 +37,8 @@ const clientSchema = z.object({
   client_expectations_notes: z.string().optional(),
   // Step 3
   retainer_value: z.string().optional(),
-  priority_level: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
-  client_status: z.enum(['active', 'paused', 'onboarding', 'churned']).default('active'),
+  priority_level: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  client_status: z.enum(['active', 'paused', 'onboarding', 'churned']).optional(),
 })
 
 type ClientFormData = z.infer<typeof clientSchema>

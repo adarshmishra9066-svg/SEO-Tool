@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/layout/sidebar'
+import type { AgencyRow } from '@/lib/database.types'
 
 export default async function DashboardLayout({
   children,
@@ -18,11 +19,13 @@ export default async function DashboardLayout({
   }
 
   // Get agency and client count
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
+
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
 
   let clientCount = 0
   if (agency) {

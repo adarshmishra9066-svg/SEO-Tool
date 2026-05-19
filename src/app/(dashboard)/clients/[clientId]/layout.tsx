@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ClientSidebar } from '@/components/layout/client-sidebar'
-import type { Client } from '@/lib/database.types'
+import type { Client, AgencyRow, ClientRow } from '@/lib/database.types'
 
 interface ClientLayoutProps {
   children: React.ReactNode
@@ -18,24 +18,25 @@ export default async function ClientLayout({ children, params }: ClientLayoutPro
 
   if (!user) redirect('/login')
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) redirect('/dashboard')
 
-  const { data: rawClient } = await supabase
+  const { data: rawClientData } = await supabase
     .from('clients')
     .select('id, name, agency_id')
     .eq('id', clientId)
     .eq('agency_id', agency.id)
     .single()
 
-  if (!rawClient) notFound()
+  if (!rawClientData) notFound()
 
-  const client = rawClient as Pick<Client, 'id' | 'name' | 'agency_id'>
+  const client = rawClientData as Pick<ClientRow, 'id' | 'name' | 'agency_id'>
 
   return (
     <div className="flex h-full overflow-hidden">

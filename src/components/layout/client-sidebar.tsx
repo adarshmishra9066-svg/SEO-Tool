@@ -21,7 +21,15 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const CLIENT_NAV_ITEMS = [
+interface NavItem {
+  segment: string
+  label: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: React.ComponentType<any>
+  exact?: boolean
+}
+
+const CLIENT_NAV_ITEMS: NavItem[] = [
   { segment: '', label: 'Overview', icon: LayoutDashboard, exact: true },
   { segment: 'opportunities', label: 'Opportunities', icon: Lightbulb },
   { segment: 'tasks', label: 'Tasks', icon: CheckSquare },
@@ -36,7 +44,7 @@ const CLIENT_NAV_ITEMS = [
   { segment: 'calendar', label: 'Calendar', icon: CalendarDays },
   { segment: 'history', label: 'History', icon: History },
   { segment: 'sops', label: 'SOPs', icon: BookOpen },
-] as const
+]
 
 interface ClientSidebarProps {
   clientId: string

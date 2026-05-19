@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
 import { TaskBoard } from '@/components/tasks/task-board'
-import type { Task, Client } from '@/lib/database.types'
+import type { Task, Client, AgencyRow } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,12 +19,13 @@ export default async function TasksPage() {
 
   if (!user) redirect('/login')
 
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user.id)
     .single()
 
+  const agency = agencyData as Pick<AgencyRow, 'id'> | null
   if (!agency) redirect('/dashboard')
 
   const [{ data: rawTasks }, { data: rawClients }] = await Promise.all([

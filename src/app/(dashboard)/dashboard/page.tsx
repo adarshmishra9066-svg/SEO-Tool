@@ -8,7 +8,7 @@ import { StatsOverview } from '@/components/dashboard/stats-overview'
 import { DoThisFirst } from '@/components/dashboard/do-this-first'
 import { ClientCard } from '@/components/dashboard/client-card'
 import { isOverdue } from '@/lib/utils'
-import type { Client, Task } from '@/lib/database.types'
+import type { Client, Task, AgencyRow } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,11 +26,13 @@ export default async function DashboardPage() {
   if (!user) redirect('/login')
 
   // Get agency
-  const { data: agency } = await supabase
+  const { data: agencyData } = await supabase
     .from('agencies')
     .select('id, name')
     .eq('owner_id', user.id)
     .single()
+
+  const agency = agencyData as Pick<AgencyRow, 'id' | 'name'> | null
 
   if (!agency) {
     return (
@@ -81,7 +83,8 @@ export default async function DashboardPage() {
     .eq('agency_id', agency.id)
     .in('status', ['new', 'planned', 'in_progress', 'waiting'])
 
-  const openTasks = allOpenTasks ?? []
+  type OpenTask = Pick<Task, 'id' | 'priority_score' | 'impact' | 'due_date' | 'status' | 'client_id'>
+  const openTasks = (allOpenTasks ?? []) as unknown as OpenTask[]
 
   const highPriorityTasks = openTasks.filter(
     (t) => t.impact === 'high' || t.impact === 'very_high'
