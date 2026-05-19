@@ -4,6 +4,7 @@ import GscConnect from '@/components/integrations/gsc-connect'
 import Ga4Connect from '@/components/integrations/ga4-connect'
 import UbersuggestImport from '@/components/integrations/ubersuggest-import'
 import { Database, BarChart3, Upload } from 'lucide-react'
+import UbersuggestLive from '@/components/integrations/ubersuggest-live'
 import type { GscProperty, Ga4PropertyRow } from '@/lib/database.types'
 
 export default async function IntegrationsPage({
@@ -87,23 +88,23 @@ export default async function IntegrationsPage({
           <Ga4Connect clientId={clientId} initialProperty={ga4Property} />
         </div>
 
-        {/* Ubersuggest */}
+        {/* Ubersuggest — Live */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
               <Upload className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">Ubersuggest CSV Import</h2>
+              <h2 className="font-semibold text-gray-900">Ubersuggest</h2>
               <p className="text-sm text-gray-500">
-                Import keyword ideas, competitor data, backlinks, and site audit results
+                Live site audit, domain overview, and keyword data — no CSV needed
               </p>
             </div>
+            <span className="ml-auto text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+              Live
+            </span>
           </div>
-          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
-            Data imported from Ubersuggest is labelled as third-party estimates and should be used as guidance only.
-          </div>
-          <UbersuggestImport clientId={clientId} />
+          <UbersuggestLive clientId={clientId} />
         </div>
       </div>
     </div>
