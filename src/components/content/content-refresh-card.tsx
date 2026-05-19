@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { TrendingDown, TrendingUp, Minus, ExternalLink, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'

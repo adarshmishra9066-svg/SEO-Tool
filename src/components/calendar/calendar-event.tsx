@@ -1,3 +1,5 @@
+'use client'
+
 import { cn, truncate } from '@/lib/utils'
 
 const TYPE_COLORS: Record<string, string> = {
