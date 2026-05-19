@@ -17,9 +17,6 @@ export async function GET(request: Request) {
     const clientId = searchParams.get('client_id')
 
     if (!clientId) return NextResponse.json({ error: 'client_id required' }, { status: 400 })
-    if (!process.env.UBERSUGGEST_API_KEY) {
-      return NextResponse.json({ error: 'UBERSUGGEST_API_KEY not configured' }, { status: 503 })
-    }
 
     const supabase = await createClient()
     const { data: rawClient } = await supabase

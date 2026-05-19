@@ -29,9 +29,6 @@ export async function POST(request: Request) {
     const { client_id, recrawl = false } = body
 
     if (!client_id) return NextResponse.json({ error: 'client_id required' }, { status: 400 })
-    if (!process.env.UBERSUGGEST_API_KEY) {
-      return NextResponse.json({ error: 'UBERSUGGEST_API_KEY not configured' }, { status: 503 })
-    }
 
     const supabase = await createClient()
     const { data: rawClient } = await supabase

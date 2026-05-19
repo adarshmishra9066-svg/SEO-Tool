@@ -1,7 +1,7 @@
 /**
  * Ubersuggest MCP HTTP client.
- * Calls the MCP server via JSON-RPC 2.0 over HTTP.
- * Requires UBERSUGGEST_API_KEY in environment.
+ * Calls the MCP server via JSON-RPC 2.0 over HTTP (Streamable HTTP transport).
+ * No API key needed — auth is handled by the MCP server session.
  */
 
 const MCP_URL = 'https://ubersuggest-mcp.neilpatelapi.com/mcp'
@@ -9,15 +9,11 @@ const MCP_URL = 'https://ubersuggest-mcp.neilpatelapi.com/mcp'
 let _reqId = 1
 
 async function callTool<T = unknown>(name: string, args: Record<string, unknown>): Promise<T> {
-  const apiKey = process.env.UBERSUGGEST_API_KEY
-  if (!apiKey) throw new Error('UBERSUGGEST_API_KEY is not set')
-
   const res = await fetch(MCP_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json, text/event-stream',
-      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       jsonrpc: '2.0',
