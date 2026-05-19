@@ -346,7 +346,7 @@ export async function POST(request: Request) {
 
     const { data: saved, error: saveError } = await supabase
       .from('opportunities')
-      .insert(ruleBasedOpportunities)
+      .insert(ruleBasedOpportunities as any)
       .select()
 
     if (saveError) {
@@ -401,7 +401,7 @@ export async function POST(request: Request) {
       if (aiInserts.length > 0) {
         const { data: aiSaved } = await supabase
           .from('opportunities')
-          .insert(aiInserts)
+          .insert(aiInserts as any)
           .select()
         aiOpportunities = aiSaved ?? []
         savedCount += (aiSaved ?? []).length

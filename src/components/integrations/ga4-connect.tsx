@@ -184,3 +184,5 @@ export function Ga4Connect({ clientId, initialProperty }: Ga4ConnectProps) {
     </Card>
   )
 }
+
+export default Ga4Connect

@@ -93,7 +93,7 @@ Return exactly this JSON structure:
         issues: result.issues,
         verdict: result.verdict,
         content_snippet: content.slice(0, 500),
-      })
+      } as any)
     }
 
     return NextResponse.json(result)

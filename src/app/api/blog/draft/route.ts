@@ -253,7 +253,7 @@ Write the complete article now. Make it genuinely useful, specific, and human.`
         human_quality_score: scores.human_quality_score,
         ai_risk_score: scores.ai_risk_score,
         status: 'draft',
-      })
+      } as any)
       .select()
       .single()
 
@@ -273,7 +273,8 @@ Write the complete article now. Make it genuinely useful, specific, and human.`
     }
 
     // Update brief status to in_progress
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('blog_briefs')
       .update({ status: 'in_progress' })
       .eq('id', brief_id)

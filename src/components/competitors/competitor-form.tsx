@@ -124,3 +124,5 @@ export function CompetitorForm({ clientId, onSuccess, onCancel }: CompetitorForm
     </form>
   )
 }
+
+export default CompetitorForm

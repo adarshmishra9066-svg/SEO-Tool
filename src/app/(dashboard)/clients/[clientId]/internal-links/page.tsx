@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import type { InternalLinkSuggestion } from '@/lib/database.types'
 import { notFound } from 'next/navigation'
 import InternalLinkTable from '@/components/internal-links/internal-link-table'
 import InternalLinkForm from '@/components/internal-links/internal-link-form'
@@ -22,10 +23,11 @@ export default async function InternalLinksPage({
   ])
 
   if (!client) notFound()
+  const safe = (suggestions ?? []) as InternalLinkSuggestion[]
 
-  const suggested = suggestions?.filter((s) => s.status === 'suggested').length ?? 0
-  const added = suggestions?.filter((s) => s.status === 'added').length ?? 0
-  const verified = suggestions?.filter((s) => s.status === 'verified').length ?? 0
+  const suggested = safe.filter((s) => s.status === 'suggested').length ?? 0
+  const added = safe.filter((s) => s.status === 'added').length ?? 0
+  const verified = safe.filter((s) => s.status === 'verified').length ?? 0
 
   return (
     <div className="p-6 space-y-6">
@@ -71,7 +73,7 @@ export default async function InternalLinksPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <InternalLinkTable suggestions={suggestions ?? []} />
+          <InternalLinkTable suggestions={safe} />
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-900 mb-4">Add Suggestion Manually</h3>

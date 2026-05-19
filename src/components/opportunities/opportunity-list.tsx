@@ -153,3 +153,5 @@ export function OpportunityList({
     </div>
   )
 }
+
+export default OpportunityList

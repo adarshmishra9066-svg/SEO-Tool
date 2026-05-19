@@ -383,3 +383,5 @@ export function UbersuggestImport({ clientId }: UbersuggestImportProps) {
     </Card>
   )
 }
+
+export default UbersuggestImport

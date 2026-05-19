@@ -129,11 +129,12 @@ Return a JSON object with exactly these fields:
     })
 
     // Get agency id
-    const { data: agency } = await supabase
+    const { data: rawAgency } = await supabase
       .from('agencies')
       .select('id')
       .eq('owner_id', user.id)
       .single()
+    const agency = rawAgency as { id: string } | null
 
     // Save to blog_briefs table
     const { data: savedBrief, error: saveError } = await supabase
@@ -162,7 +163,7 @@ Return a JSON object with exactly these fields:
         status: 'draft',
         source_type: source_type ?? 'manual',
         source_keyword: keyword ?? null,
-      })
+      } as any)
       .select()
       .single()
 

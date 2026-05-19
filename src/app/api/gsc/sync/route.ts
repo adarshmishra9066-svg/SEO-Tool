@@ -238,7 +238,7 @@ export async function POST(request: Request) {
         property_url: client.website_url,
         is_connected: false,
         last_synced: null,
-      })
+      } as any)
       .select()
       .single()
     propData = newProp
@@ -271,14 +271,15 @@ export async function POST(request: Request) {
     date: row.date,
   }))
 
-  const { error: insertError } = await supabase.from('gsc_query_data').insert(insertRows)
+  const { error: insertError } = await supabase.from('gsc_query_data').insert(insertRows as any)
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 })
   }
 
   // Mark property as synced
-  await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any)
     .from('gsc_properties')
     .update({ last_synced: new Date().toISOString() })
     .eq('id', propertyId)

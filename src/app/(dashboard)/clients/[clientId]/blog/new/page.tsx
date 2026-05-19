@@ -39,10 +39,10 @@ export default async function NewBlogBriefPage({ params }: PageProps) {
     .order('impressions', { ascending: false })
     .limit(30)
 
-  const gscOpportunities = (gscData ?? []).map((d) => ({
-    query: d.query as string,
-    impressions: d.impressions as number,
-    position: d.position as number,
+  const gscOpportunities = ((gscData ?? []) as Array<{ query: string; impressions: number; position: number }>).map((d) => ({
+    query: d.query,
+    impressions: d.impressions,
+    position: d.position,
   }))
 
   return (

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import ReportCard from '@/components/reports/report-card'
 import ReportGenerator from '@/components/reports/report-generator'
 import { FileText, Plus } from 'lucide-react'
+import type { Report } from '@/lib/database.types'
 
 export default async function ReportsPage({
   params,
@@ -22,6 +23,8 @@ export default async function ReportsPage({
   ])
 
   if (!client) notFound()
+  const safeClient = client as { id: string; name: string }
+  const safeReports = (reports ?? []) as Report[]
 
   return (
     <div className="p-6 space-y-6">
@@ -32,12 +35,12 @@ export default async function ReportsPage({
             Generate plain-English reports that clients actually understand.
           </p>
         </div>
-        <ReportGenerator clientId={clientId} clientName={client.name} />
+        <ReportGenerator clientId={clientId} clientName={safeClient.name} />
       </div>
 
-      {reports && reports.length > 0 ? (
+      {safeReports.length > 0 ? (
         <div className="grid gap-4">
-          {reports.map((report) => (
+          {safeReports.map((report) => (
             <ReportCard key={report.id} report={report} clientId={clientId} />
           ))}
         </div>
@@ -48,7 +51,7 @@ export default async function ReportsPage({
           <p className="text-sm text-gray-500 mb-4 text-center max-w-xs">
             Generate your first monthly report. It will pull from GSC, GA4, tasks, and backlinks automatically.
           </p>
-          <ReportGenerator clientId={clientId} clientName={client.name} buttonLabel="Generate First Report" />
+          <ReportGenerator clientId={clientId} clientName={safeClient.name} buttonLabel="Generate First Report" />
         </div>
       )}
     </div>

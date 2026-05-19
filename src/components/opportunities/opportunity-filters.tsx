@@ -169,3 +169,5 @@ export function OpportunityFilters({
     </div>
   )
 }
+
+export default OpportunityFilters

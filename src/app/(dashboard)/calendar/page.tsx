@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import CalendarView from '@/components/calendar/calendar-view'
+import type { CalendarItem } from '@/lib/database.types'
 
 export default async function CalendarPage() {
   const supabase = await createClient()
@@ -8,28 +9,34 @@ export default async function CalendarPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data: agency } = await supabase
+  const { data: rawAgency } = await supabase
     .from('agencies')
     .select('id')
     .eq('owner_id', user?.id ?? '')
     .single()
+  const agency = rawAgency as { id: string } | null
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
   const [{ data: items }, { data: clients }] = await Promise.all([
     agency
-      ? supabase
+      ? db
           .from('calendar_items')
           .select('*, clients(name)')
           .eq('agency_id', agency.id)
           .order('due_date', { ascending: true })
       : Promise.resolve({ data: [] }),
     agency
-      ? supabase
+      ? db
           .from('clients')
           .select('id, name')
           .eq('agency_id', agency.id)
           .eq('client_status', 'active')
       : Promise.resolve({ data: [] }),
   ])
+
+  const safeItems = (items ?? []) as CalendarItem[]
+  const safeClients = (clients ?? []) as { id: string; name: string }[]
 
   return (
     <div className="p-6">
@@ -40,8 +47,8 @@ export default async function CalendarPage() {
         </p>
       </div>
       <CalendarView
-        items={items ?? []}
-        clients={clients ?? []}
+        items={safeItems}
+        clients={safeClients}
         agencyId={agency?.id ?? ''}
       />
     </div>

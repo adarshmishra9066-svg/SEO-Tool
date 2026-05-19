@@ -39,10 +39,10 @@ export async function POST(request: Request) {
 
   // Gather data
   const [
-    { data: client },
-    { data: gscData },
-    { data: tasks },
-    { data: backlinks },
+    { data: rawClient },
+    { data: rawGscData },
+    { data: rawTasks },
+    { data: rawBacklinks },
   ] = await Promise.all([
     supabase.from('clients').select('name, website_url, industry').eq('id', client_id).single(),
     supabase
@@ -65,9 +65,14 @@ export async function POST(request: Request) {
       .in('status', ['live_link_verified', 'indexed', 'published']),
   ])
 
-  const completedTasks = tasks?.filter((t) => t.status === 'completed') ?? []
-  const totalClicks = gscData?.reduce((s, r) => s + (r.clicks ?? 0), 0) ?? 0
-  const totalImpressions = gscData?.reduce((s, r) => s + (r.impressions ?? 0), 0) ?? 0
+  const client = rawClient as { name: string; website_url: string; industry: string | null } | null
+  const gscData = (rawGscData ?? []) as Array<{ query: string; clicks: number; impressions: number; position: number }>
+  const tasks = (rawTasks ?? []) as Array<{ title: string; status: string; task_type: string; completion_date: string | null }>
+  const backlinks = rawBacklinks as unknown[] | null
+
+  const completedTasks = tasks.filter((t) => t.status === 'completed')
+  const totalClicks = gscData.reduce((s, r) => s + (r.clicks ?? 0), 0)
+  const totalImpressions = gscData.reduce((s, r) => s + (r.impressions ?? 0), 0)
   const liveBacklinks = backlinks?.length ?? 0
 
   const reportTitle = `${client?.name ?? 'Client'} SEO Report — ${new Date(period_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
@@ -76,8 +81,8 @@ export async function POST(request: Request) {
 Client: ${client?.name} (${client?.website_url})
 Industry: ${client?.industry ?? 'Not specified'}
 Period: ${period_start} to ${period_end}
-GSC Summary: ${totalClicks} total clicks, ${totalImpressions} impressions across ${gscData?.length ?? 0} queries
-Top keywords: ${gscData?.slice(0, 5).map((d) => `${d.query} (${d.clicks} clicks)`).join(', ') || 'No data'}
+GSC Summary: ${totalClicks} total clicks, ${totalImpressions} impressions across ${gscData.length} queries
+Top keywords: ${gscData.slice(0, 5).map((d) => `${d.query} (${d.clicks} clicks)`).join(', ') || 'No data'}
 Tasks completed: ${completedTasks.length}
 ${completedTasks.map((t) => `- ${t.title}`).join('\n')}
 Live backlinks built: ${liveBacklinks}
@@ -111,13 +116,13 @@ Keep it concise but comprehensive. Tone: confident, clear, professional, human.`
       gsc_summary: {
         total_clicks: totalClicks,
         total_impressions: totalImpressions,
-        top_queries: gscData?.slice(0, 10) ?? [],
+        top_queries: gscData.slice(0, 10),
       },
       backlinks_built: liveBacklinks,
       blogs_published: completedTasks.filter((t) => t.task_type === 'new_blog').length,
       pages_refreshed: completedTasks.filter((t) => t.task_type === 'content_refresh').length,
       status: 'draft',
-    })
+    } as any)
     .select()
     .single()
 

@@ -35,7 +35,7 @@ export default async function CompetitorsPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <CompetitorList competitors={competitors ?? []} clientId={clientId} />
+          <CompetitorList competitors={competitors ?? []} />
         </div>
         <div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">

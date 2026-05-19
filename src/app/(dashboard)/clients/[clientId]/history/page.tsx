@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import HistoryTimeline from '@/components/history/history-timeline'
+import type { ClientHistory } from '@/lib/database.types'
 
 export default async function HistoryPage({
   params,
@@ -21,16 +22,18 @@ export default async function HistoryPage({
   ])
 
   if (!client) notFound()
+  const safeClient = client as { id: string; name: string }
+  const safeHistory = (history ?? []) as ClientHistory[]
 
   return (
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-xl font-semibold text-gray-900">SEO History</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Every action taken for {client.name} — helps explain future ranking and traffic changes.
+          Every action taken for {safeClient.name} — helps explain future ranking and traffic changes.
         </p>
       </div>
-      <HistoryTimeline entries={history ?? []} clientId={clientId} />
+      <HistoryTimeline history={safeHistory} />
     </div>
   )
 }

@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       period_end: period_end ?? null,
       report_type: report_type ?? 'monthly',
       status: 'draft',
-    })
+    } as any)
     .select()
     .single()
 

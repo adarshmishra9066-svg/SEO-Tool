@@ -106,3 +106,5 @@ export function CompetitorList({ competitors, onDelete }: CompetitorListProps) {
     </div>
   )
 }
+
+export default CompetitorList

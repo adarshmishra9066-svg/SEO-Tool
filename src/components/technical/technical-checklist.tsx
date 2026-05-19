@@ -419,3 +419,5 @@ export function TechnicalChecklist({ issues }: TechnicalChecklistProps) {
     </div>
   )
 }
+
+export default TechnicalChecklist

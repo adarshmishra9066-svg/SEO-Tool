@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       reason: reason ?? null,
       priority: priority ?? 'medium',
       status: 'suggested',
-    })
+    } as any)
     .select()
     .single()
 
@@ -51,7 +51,9 @@ export async function PUT(request: Request) {
 
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
+  const { data, error } = await db
     .from('internal_link_suggestions')
     .update({ status, updated_at: new Date().toISOString() })
     .eq('id', id)

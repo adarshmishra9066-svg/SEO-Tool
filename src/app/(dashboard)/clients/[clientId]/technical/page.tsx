@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import type { TechnicalIssue } from '@/lib/database.types'
 import { notFound } from 'next/navigation'
 import TechnicalChecklist from '@/components/technical/technical-checklist'
 import { ShieldCheck } from 'lucide-react'
@@ -21,10 +22,11 @@ export default async function TechnicalSEOPage({
   ])
 
   if (!client) notFound()
+  const safe = (issues ?? []) as TechnicalIssue[]
 
-  const critical = issues?.filter((i) => i.severity === 'critical').length ?? 0
-  const high = issues?.filter((i) => i.severity === 'high').length ?? 0
-  const open = issues?.filter((i) => i.status === 'open').length ?? 0
+  const critical = safe.filter((i) => i.severity === 'critical').length ?? 0
+  const high = safe.filter((i) => i.severity === 'high').length ?? 0
+  const open = safe.filter((i) => i.status === 'open').length ?? 0
 
   return (
     <div className="p-6 space-y-6">
@@ -59,7 +61,7 @@ export default async function TechnicalSEOPage({
         </div>
       </div>
 
-      <TechnicalChecklist clientId={clientId} issues={issues ?? []} />
+      <TechnicalChecklist issues={safe} />
     </div>
   )
 }

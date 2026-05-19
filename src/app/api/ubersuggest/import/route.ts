@@ -216,7 +216,7 @@ export async function POST(request: Request) {
       // Insert in batches of 50
       for (let i = 0; i < mappedRows.length; i += 50) {
         const batch = mappedRows.slice(i, i + 50)
-        const { error } = await supabase.from('keywords').insert(batch as Record<string, unknown>[])
+        const { error } = await supabase.from('keywords').insert(batch as any)
         if (!error) processedCount += batch.length
       }
     }
@@ -228,7 +228,7 @@ export async function POST(request: Request) {
     if (mappedRows.length > 0) {
       for (let i = 0; i < mappedRows.length; i += 50) {
         const batch = mappedRows.slice(i, i + 50)
-        const { error } = await supabase.from('backlink_prospects').insert(batch as Record<string, unknown>[])
+        const { error } = await supabase.from('backlink_prospects').insert(batch as any)
         if (!error) processedCount += batch.length
       }
     }
@@ -240,7 +240,7 @@ export async function POST(request: Request) {
     if (mappedRows.length > 0) {
       for (let i = 0; i < mappedRows.length; i += 50) {
         const batch = mappedRows.slice(i, i + 50)
-        const { error } = await supabase.from('technical_issues').insert(batch as Record<string, unknown>[])
+        const { error } = await supabase.from('technical_issues').insert(batch as any)
         if (!error) processedCount += batch.length
       }
     }
@@ -258,7 +258,7 @@ export async function POST(request: Request) {
       rows_processed: processedCount,
       column_mapping: columnMapping,
       status: processedCount > 0 ? 'completed' : 'failed',
-    })
+    } as any)
     .select()
     .single()
 

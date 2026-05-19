@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       price: price ?? null,
       quality_score: quality,
       status: 'prospect_found',
-    })
+    } as any)
     .select()
     .single()
 
@@ -73,7 +73,9 @@ export async function PUT(request: Request) {
 
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
-  const { data, error } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
+  const { data, error } = await db
     .from('backlink_prospects')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id)

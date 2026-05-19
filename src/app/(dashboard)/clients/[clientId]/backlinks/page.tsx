@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import BacklinkProspectTable from '@/components/backlinks/backlink-prospect-table'
 import BacklinkForm from '@/components/backlinks/backlink-form'
 import { ExternalLink } from 'lucide-react'
+import type { BacklinkProspect } from '@/lib/database.types'
 
 export default async function BacklinksPage({
   params,
@@ -23,8 +24,9 @@ export default async function BacklinksPage({
 
   if (!client) notFound()
 
+  const safeProspects = (prospects ?? []) as BacklinkProspect[]
   const pipeline: Record<string, number> = {}
-  for (const p of prospects ?? []) {
+  for (const p of safeProspects) {
     pipeline[p.status] = (pipeline[p.status] ?? 0) + 1
   }
 
@@ -59,7 +61,7 @@ export default async function BacklinksPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <BacklinkProspectTable prospects={prospects ?? []} />
+          <BacklinkProspectTable prospects={safeProspects} />
         </div>
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-gray-200 p-5">

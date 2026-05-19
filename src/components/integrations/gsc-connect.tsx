@@ -186,3 +186,5 @@ export function GscConnect({ clientId, initialProperty }: GscConnectProps) {
     </Card>
   )
 }
+
+export default GscConnect

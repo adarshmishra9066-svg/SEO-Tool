@@ -68,7 +68,7 @@ export async function POST(request: Request) {
         refresh_token: null,
         token_expiry: null,
         last_synced: null,
-      },
+      } as any,
       { onConflict: 'client_id' }
     )
     .select()

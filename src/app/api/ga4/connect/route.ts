@@ -118,7 +118,7 @@ export async function POST(request: Request) {
         property_name: body.property_name ?? 'GA4 Property (Mock)',
         is_connected: false,
         last_synced: null,
-      },
+      } as any,
       { onConflict: 'client_id' }
     )
     .select()
@@ -143,14 +143,15 @@ export async function POST(request: Request) {
     property_id: propertyId,
   }))
 
-  const { error: insertError } = await supabase.from('ga4_landing_page_data').insert(insertRows)
+  const { error: insertError } = await supabase.from('ga4_landing_page_data').insert(insertRows as any)
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 })
   }
 
   // Mark as synced
-  await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any)
     .from('ga4_properties')
     .update({ last_synced: new Date().toISOString() })
     .eq('id', propertyId)

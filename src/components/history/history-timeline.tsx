@@ -259,3 +259,5 @@ export function HistoryTimeline({ history }: HistoryTimelineProps) {
     </div>
   )
 }
+
+export default HistoryTimeline

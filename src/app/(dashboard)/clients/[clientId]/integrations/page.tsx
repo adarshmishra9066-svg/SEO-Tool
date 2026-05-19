@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import GscConnect from '@/components/integrations/gsc-connect'
 import Ga4Connect from '@/components/integrations/ga4-connect'
 import UbersuggestImport from '@/components/integrations/ubersuggest-import'
-import { Database2, BarChart3, Upload } from 'lucide-react'
+import { Database, BarChart3, Upload } from 'lucide-react'
+import type { GscProperty, Ga4PropertyRow } from '@/lib/database.types'
 
 export default async function IntegrationsPage({
   params,
@@ -20,16 +21,16 @@ export default async function IntegrationsPage({
   ])
 
   if (!client) notFound()
-
-  const gscProperty = gscProps?.[0] ?? null
-  const ga4Property = ga4Props?.[0] ?? null
+  const safeClient = client as { id: string; name: string; website_url: string }
+  const gscProperty = ((gscProps ?? []) as GscProperty[])[0] ?? null
+  const ga4Property = ((ga4Props ?? []) as Ga4PropertyRow[])[0] ?? null
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
       <div>
         <h1 className="text-xl font-semibold text-gray-900">Integrations</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Connect data sources for {client.name} to unlock opportunities and reports.
+          Connect data sources for {safeClient.name} to unlock opportunities and reports.
         </p>
       </div>
 
@@ -38,7 +39,7 @@ export default async function IntegrationsPage({
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-              <Database2 className="w-5 h-5 text-blue-600" />
+              <Database className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <h2 className="font-semibold text-gray-900">Google Search Console</h2>
@@ -57,7 +58,7 @@ export default async function IntegrationsPage({
               )}
             </div>
           </div>
-          <GscConnect clientId={clientId} existingProperty={gscProperty} />
+          <GscConnect clientId={clientId} initialProperty={gscProperty} />
         </div>
 
         {/* GA4 */}
@@ -83,7 +84,7 @@ export default async function IntegrationsPage({
               )}
             </div>
           </div>
-          <Ga4Connect clientId={clientId} existingProperty={ga4Property} />
+          <Ga4Connect clientId={clientId} initialProperty={ga4Property} />
         </div>
 
         {/* Ubersuggest */}
