@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,7 +26,7 @@ const signUpSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 type SignUpFormData = z.infer<typeof signUpSchema>
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirectTo') ?? '/dashboard'
   const [mode, setMode] = React.useState<'login' | 'signup'>('login')
@@ -228,5 +229,13 @@ export default function LoginPage() {
         </form>
       )}
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

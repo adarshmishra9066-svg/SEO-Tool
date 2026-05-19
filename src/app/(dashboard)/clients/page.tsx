@@ -1,5 +1,3 @@
-'use client'
-
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Plus, Users, ExternalLink } from 'lucide-react'
@@ -129,7 +127,7 @@ export default async function ClientsPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-500 transition-colors w-fit"
-                          onClick={(e) => e.stopPropagation()}
+
                         >
                           <ExternalLink className="w-2.5 h-2.5" />
                           {getDomain(client.website_url)}
